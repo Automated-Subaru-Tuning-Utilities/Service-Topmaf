@@ -4,8 +4,8 @@ import sys
 
 sys.path.append("topmaf/models/")
 sys.path.append("topmaf/")
-from lowmaf_request_model import lowmaf_input, lowmaf_output
-import lowmaf_calc
+from topmaf_api_models import topmaf_input, topmaf_output
+import topmaf_calc
 
 app = FastAPI()
 
@@ -19,10 +19,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-#lowmaf route
-@app.post("/api/analyze/0/", response_model = list[lowmaf_output])
-def read_data( log: list[lowmaf_input] ):
-    print("Received data that fits into model.")
-    resp = lowmaf_calc.main(log)
-    print("Calculations completed. Responding with scaling data.")
-    return resp
+#topmaf route
+@app.post("/api/analyze/1/")
+def read_data( log: topmaf_input):
+    return log
