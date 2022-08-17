@@ -22,4 +22,7 @@ app.add_middleware(
 #topmaf route
 @app.post("/api/analyze/1/")
 def read_data( log: topmaf_input):
-    return log
+    print("Received data that fits into model.")
+    resp = topmaf_calc.main(log)
+    print("Calculations completed. Responding with scaling data.")
+    return resp
