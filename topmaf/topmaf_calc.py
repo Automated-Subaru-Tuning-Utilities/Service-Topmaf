@@ -49,6 +49,39 @@ def afr_error_helper(triple, targets):
 
 # step 3
 # match up the corrections with the cooresponding maf voltages
+# mostly copied from Service-Lowmaf/lowmaf/lowmaf_calc.py
+def match_maf(df, maf_voltages):
+    # we go from index = 0 to index = len -1 in the loop because we need a special case for the first and last indicies
+    # check length once for optimization (although compiler might do this)
+    maf_voltages_length = len(maf_voltages) - 1
+    # for index 0, we check values >=0 and <.94
+    # this is due to the way that ECUflash handles interpolation
+    vals = df[(df["mass_airflow_voltage"] >= 0) & (df["mass_airflow_voltage"] < maf_voltages[0]["MafVoltage"])]
+    freq = len(vals)
+    if (freq > 0):
+        mean = vals["afr_error"].mean()
+        mean = np.around(mean, decimals=5)
+        maf_voltages[0]["Correction"] = mean
+        maf_voltages[0]["Frequency"] += freq
+    for i in range (1, maf_voltages_length):
+        vals = df[(df["mass_airflow_voltage"] >= maf_voltages[i]["MafVoltage"]) & (df["mass_airflow_voltage"] < maf_voltages[i+1]["MafVoltage"])]
+        freq = len(vals)
+        if (freq > 0):
+            mean = vals["afr_error"].mean()
+            mean = np.around(mean, decimals=5)
+            maf_voltages[i]["Correction"] = mean
+            maf_voltages[i]["Frequency"] += freq
+    # special case for last index
+    # we check values >4.69 and <= 5.0
+    vals = df[(df["mass_airflow_voltage"] > maf_voltages[len(maf_voltages)-1]["MafVoltage"]) & (df["mass_airflow_voltage"] <= 5.0)]
+    freq = len(vals)
+    if (len(vals) > 0):
+        mean = vals["afr_error"].mean()
+        mean = np.around(mean, decimals=5)
+        maf_voltages[maf_voltages_length]["Correction"] = mean
+        maf_voltages[maf_voltages_length]["Frequency"] += freq
+
+    return maf_voltages
 
 def main(data: topmaf_input):
     #turn input data into dataframes
@@ -56,11 +89,11 @@ def main(data: topmaf_input):
     targets = pd.DataFrame(targets)
     log_data = [i.dict() for i in data.log_data]
     log_data = pd.DataFrame(log_data)
-    
+
+    #data analysis steps
     log_data = filter_data(log_data)
     log_data = afr_error(log_data, targets)
-    print(log_data)
+    return match_maf(log_data, maf_voltages)
 
-    return {"result": "success"}
 if __name__ == "__main__":
     print("testing here")
