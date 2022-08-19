@@ -6,6 +6,22 @@ sys.path.append("./models")
 from topmaf_api_models import topmaf_input
 from maf_voltages import maf_voltages
 
+# step 1
+# filter out any data not near 100% throttle 
+def filter_data(df):
+    new_data = df[df["throttle_position"] > 87]
+    new_data.reset_index(drop=True, inplace=True)
+    return new_data
+
+# step 2 
+# find the percent error of target afrs to wideband afrs
+# this is done by matching the closest load/rpm pair in the log to the target afrmap
+def afr_error(df, targets):
+    #create the afr_error column
+    df.loc[0, "afr_error"] = 0.0
+    for i in range(1, len(df)):
+        print(df.loc[i])
+    
 def main(data: topmaf_input):
     #turn input data into dataframes
     targets = [i.dict() for i in data.target_afr]
@@ -13,14 +29,9 @@ def main(data: topmaf_input):
     log_data = [i.dict() for i in data.log_data]
     log_data = pd.DataFrame(log_data)
     
-    #for testing
-    # print(targets)
+    log_data = filter_data(log_data)
     # print(log_data)
-    print(targets.loc[0,"target_afr"])
-    print(targets.loc[1,"rpm"])
-
-    print(log_data.loc[0,"wideband_o2"])
-    print(log_data.loc[0,"load"])
+    afr_error(log_data, targets)
 
     return {"result": "success"}
 if __name__ == "__main__":
