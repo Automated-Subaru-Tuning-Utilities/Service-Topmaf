@@ -20,7 +20,25 @@ def afr_error(df, targets):
     #create the afr_error column
     df.loc[0, "afr_error"] = 0.0
     for i in range(1, len(df)):
-        print(df.loc[i])
+        vals = [df.loc[i, "rpm"], df.loc[i, "load"], df.loc[i, "wideband_o2"]]
+        error = afr_error_helper(vals, targets)
+
+def afr_error_helper(vals, targets):
+    rpm = vals[0]
+    load = vals[1]
+    wideband = vals[2]
+    rpm_match = targets.iloc[(targets["rpm"] - rpm).abs().argsort()[:2]]
+    load_match = targets.iloc[(targets["load"] - load).abs().argsort()[:2]]
+    
+    # match using ECU flash's interpolation scheme
+    rpm_match = max(rpm_match["rpm"].tolist())
+    load_match = max(load_match["load"].tolist())
+    afr_match = targets[ (targets["rpm"] == rpm_match) & (targets["load"] == load_match)]
+    afr_match.reset_index(drop=True, inplace=True)
+    afr_match = afr_match.loc[0,"target_afr"]
+    error = 100*(wideband - afr_match)/afr_match
+    print(f"({rpm},{load},{wideband}) matches-> {afr_match},{error}")
+    return error
     
 def main(data: topmaf_input):
     #turn input data into dataframes
