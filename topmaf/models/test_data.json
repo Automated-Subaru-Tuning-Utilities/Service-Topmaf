@@ -1,0 +1,88 @@
+{
+    "target_afr": [
+      {
+        "load": 1.0,
+        "rpm": 1000,
+        "target_afr": 14.7
+      },
+      {
+        "load": 2.0,
+        "rpm": 2700,
+        "target_afr": 13.5
+      },
+      {
+        "load": 2.5,
+        "rpm": 3500,
+        "target_afr": 11.9
+      },
+      {
+        "load": 2.75,
+        "rpm": 4500,
+        "target_afr": 10.5
+      },
+      {
+        "load": 3.0,
+        "rpm": 6000,
+        "target_afr": 10.25
+      }
+  
+    ],
+    "log_data": [
+      {
+        "mass_airflow_voltage": 0.4,
+        "throttle_position": 5,
+        "load": 0.1,
+        "rpm": 1100,
+        "wideband_o2": 14.82
+      },
+      {
+        "mass_airflow_voltage": 1.0,
+        "throttle_position": 20,
+        "load": 0.75,
+        "rpm": 1600,
+        "wideband_o2": 14.62 
+      },
+      {
+        "mass_airflow_voltage": 1.8,
+        "throttle_position": 40,
+        "load": 1.1,
+        "rpm": 2200,
+        "wideband_o2": 14.23 
+      },
+      {
+        "mass_airflow_voltage": 2.4,
+        "throttle_position": 75,
+        "load": 2.2,
+        "rpm": 2800,
+        "wideband_o2": 13.1 
+      },
+      {
+        "mass_airflow_voltage": 2.9,
+        "throttle_position": 92,
+        "load": 2.5,
+        "rpm": 3500,
+        "wideband_o2": 11.5 
+      },
+      {
+        "mass_airflow_voltage": 3.6,
+        "throttle_position": 100,
+        "load": 2.65,
+        "rpm": 4300,
+        "wideband_o2": 10.6 
+      },
+      {
+        "mass_airflow_voltage": 3.9,
+        "throttle_position": 100,
+        "load": 2.85,
+        "rpm": 5000,
+        "wideband_o2": 10.4 
+      },
+      {
+        "mass_airflow_voltage": 4.0,
+        "throttle_position": 100,
+        "load": 3.1,
+        "rpm": 6000,
+        "wideband_o2": 10.0 
+      }
+    ]
+  }
