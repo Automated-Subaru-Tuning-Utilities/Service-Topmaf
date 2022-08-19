@@ -17,16 +17,18 @@ def filter_data(df):
 # find the percent error of target afrs to wideband afrs
 # this is done by matching the closest load/rpm pair in the log to the target afrmap
 def afr_error(df, targets):
-    #create the afr_error column
+    #create the afr_error column  
     df.loc[0, "afr_error"] = 0.0
-    for i in range(1, len(df)):
-        vals = [df.loc[i, "rpm"], df.loc[i, "load"], df.loc[i, "wideband_o2"]]
-        error = afr_error_helper(vals, targets)
+    for i in range(0, len(df)):
+        triple = [df.loc[i, "rpm"], df.loc[i, "load"], df.loc[i, "wideband_o2"]]
+        error = afr_error_helper(triple, targets)
+        df.loc[i,"afr_error"] = error
+    return df
 
-def afr_error_helper(vals, targets):
-    rpm = vals[0]
-    load = vals[1]
-    wideband = vals[2]
+def afr_error_helper(triple, targets):
+    rpm = triple[0]
+    load = triple[1]
+    wideband = triple[2]
     rpm_match = targets.iloc[(targets["rpm"] - rpm).abs().argsort()[:2]]
     load_match = targets.iloc[(targets["load"] - load).abs().argsort()[:2]]
     
@@ -35,11 +37,19 @@ def afr_error_helper(vals, targets):
     load_match = max(load_match["load"].tolist())
     afr_match = targets[ (targets["rpm"] == rpm_match) & (targets["load"] == load_match)]
     afr_match.reset_index(drop=True, inplace=True)
-    afr_match = afr_match.loc[0,"target_afr"]
-    error = 100*(wideband - afr_match)/afr_match
-    print(f"({rpm},{load},{wideband}) matches-> {afr_match},{error}")
-    return error
     
+    # handle case where user supplies an incomplete target_afr map
+    if(len(afr_match) < 1):
+        print(f"WARNING: Entry (Rpm: {rpm_match}, Load: {load_match}) was not found in target_afr. Defaulting to 0% error")
+        error = 0
+    else:
+        afr_match = afr_match.loc[0,"target_afr"]
+        error = 100*(wideband - afr_match)/afr_match
+    return error
+
+# step 3
+# match up the corrections with the cooresponding maf voltages
+
 def main(data: topmaf_input):
     #turn input data into dataframes
     targets = [i.dict() for i in data.target_afr]
@@ -48,8 +58,8 @@ def main(data: topmaf_input):
     log_data = pd.DataFrame(log_data)
     
     log_data = filter_data(log_data)
-    # print(log_data)
-    afr_error(log_data, targets)
+    log_data = afr_error(log_data, targets)
+    print(log_data)
 
     return {"result": "success"}
 if __name__ == "__main__":
