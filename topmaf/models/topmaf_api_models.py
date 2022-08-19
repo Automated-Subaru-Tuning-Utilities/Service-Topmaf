@@ -8,8 +8,7 @@ from pydantic import BaseModel
 #   Lets say we have a main api endpoint that returns 10 fields of data
 #   We can reuse this api for multiple purposes by filtering for only the fields that we need
 #   This also can potentially provide a security benefit by filtering before transport of data, to prevent sensitive info disclosure
-
-   
+ 
 class target_afr(BaseModel):
     load: float
     rpm: int
