@@ -6,10 +6,13 @@ sys.path.append("./models")
 from topmaf_api_models import topmaf_input
 from maf_voltages import maf_voltages
 
+MIN_THROTTLE = 75
+
 # step 1
-# filter out any data not near 100% throttle 
+# filter out any data not near 100% throttle
+# TODO: Make min throttle value user defined 
 def filter_data(df):
-    new_data = df[df["throttle_position"] > 87]
+    new_data = df[df["throttle_position"] > MIN_THROTTLE]
     new_data.reset_index(drop=True, inplace=True)
     return new_data
 
